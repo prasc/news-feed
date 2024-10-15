@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../assets/CreatePostForm.scss';
 
 type CreatePostFormProps = {
-  onPostSubmit: (post: { content: string; id: number; likes: number }) => void;
+  onPostSubmit: (post: { content: string }) => void;
 };
 
 const CreatePostForm: React.FC<CreatePostFormProps> = ({ onPostSubmit }) => {
@@ -18,7 +18,7 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onPostSubmit }) => {
     }
 
     setError(null); // Basically clear error state if we made it here
-    onPostSubmit({ content: postContent, id: Date.now(), likes: 0 });
+    onPostSubmit({ content: postContent });
     setPostContent('');
   };
 

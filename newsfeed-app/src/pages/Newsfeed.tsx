@@ -24,8 +24,9 @@ const Newsfeed: React.FC = () => {
   }, []);
 
   // Add a new post and send it to the API
-  const addNewPost = async (newPost: PostType) => {
+  const addNewPost = async (newPost: Omit<PostType, '_id' | 'createdAt'>) => {
     try {
+      console.log('Sending new post:', newPost); // Log the data
       const response = await fetch('http://localhost:5001/api/posts', {
         method: 'POST',
         headers: {
@@ -33,6 +34,10 @@ const Newsfeed: React.FC = () => {
         },
         body: JSON.stringify(newPost),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to create post');
+      }
 
       const savedPost = await response.json();
       setPosts([savedPost, ...posts]); // Add the newly created post to the list
@@ -42,13 +47,23 @@ const Newsfeed: React.FC = () => {
   };
 
   // Delete a post from the API
-  const deletePost = async (id: number) => {
+  const deletePost = async (_id: string) => {
+    if (!_id) {
+      console.error('Post ID is undefined or invalid');
+      return;
+    }
+
     try {
-      await fetch(`http://localhost:5001/api/posts/${id}`, {
+      const response = await fetch(`http://localhost:5001/api/posts/${_id}`, {
         method: 'DELETE',
       });
-      const updatedPosts = posts.filter((post) => post.id !== id);
-      setPosts(updatedPosts);
+
+      if (response.ok) {
+        const updatedPosts = posts.filter((post) => post._id !== _id);
+        setPosts(updatedPosts);
+      } else {
+        console.log('Failed to delete Post');
+      }
     } catch (error) {
       console.error('Error deleting post:', error);
     }
@@ -61,7 +76,7 @@ const Newsfeed: React.FC = () => {
         <CreatePostForm onPostSubmit={addNewPost} />
         <div className="main-feed">
           {posts.map((post) => (
-            <Post post={post} onDelete={deletePost} />
+            <Post key={post._id} post={post} onDelete={deletePost} />
           ))}
         </div>
       </div>

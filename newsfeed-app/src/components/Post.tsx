@@ -3,26 +3,25 @@ import { PostType } from '../types';
 
 interface PostProps {
   post: PostType;
-  onDelete: (id: number) => void;
+  onDelete: (_id: string) => void; // Use _id instead of id
 }
 
 const Post: React.FC<PostProps> = ({ post, onDelete }) => {
-  const { id, content, likes } = post;
+  const { _id, content, createdAt = '', likes } = post;
+  console.log('id', _id);
   const [currentLikes, setCurrentLikes] = useState<number>(likes || 0);
 
   const handleLike = () => {
     setCurrentLikes(currentLikes + 1);
   };
 
-  const handleDelete = () => {
-    onDelete(id);
-  };
-
   return (
-    <div className="post" key={id}>
+    <div className="post" key={_id}>
       <p>{content}</p>
+      <small>{new Date(createdAt).toLocaleDateString()}</small>{' '}
+      {/* Optional: Format createdAt */}
       <button onClick={handleLike}>Like ({currentLikes})</button>
-      <button onClick={handleDelete}>Delete</button>
+      <button onClick={() => onDelete(_id)}>Delete Post</button>
     </div>
   );
 };
