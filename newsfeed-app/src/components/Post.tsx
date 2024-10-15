@@ -18,7 +18,9 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
   return (
     <div className="post" key={_id}>
       <p>{content}</p>
-      <small>{new Date(createdAt).toLocaleDateString()}</small>{' '}
+      <div className="post-info">
+        <small>{new Date(createdAt).toLocaleDateString()}</small>{' '}
+      </div>
       {/* Optional: Format createdAt */}
       <button onClick={handleLike}>Like ({currentLikes})</button>
       <button onClick={() => onDelete(_id)}>Delete Post</button>

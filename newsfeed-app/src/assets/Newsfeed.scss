@@ -1,6 +1,90 @@
-.newsfeed {
+.container.newsfeed {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.main-feed {
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.main-feed button {
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #3498db;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.main-feed button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+// Styling individual post
+.post {
+    padding: 15px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.post-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.post-info small {
+    font-size: 12px;
+    color: #888
+}
+
+.post p {
+    font-size: 16px;
+    color: #333;
+    margin: 0 0 10px 0; /* Add margin below the post content */
+}
+
+.post button {
+    margin-right: 10px; /* Adds spacing between the buttons */
+    padding: 5px 10px;
+    background-color: #e74c3c;
+    bottom: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+.post button:last-child {
+    margin-right: 0; /* No margin for the last button */
+}
+
+.post button:hover {
+    background-color: #c0392b;
+}
+
+// Responsive Design
+@media (max-width: 600px) {
+    .container.newsfeed {
+        padding: 10px;
+    }
+
+    .post {
+        padding: 10px;
+    }
+
+    .main-feed button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
 }
