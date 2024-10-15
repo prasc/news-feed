@@ -2,9 +2,18 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
 
+// Create a new post
 router.post('/posts', async (req, res) => {
+  const { content, authorId } = req.body;
+
+  if (!content) {
+    return res.status(400).json({ message: 'Content is required' });
+  }
+
   const newPost = new Post({
-    content: req.body.content,
+    content,
+    authorId: authorId || null, // default to null if authorId is not provided
+    id: Date.now(),
   });
 
   try {
@@ -24,12 +33,12 @@ router.get('/posts', async (req, res) => {
   }
 });
 
-router.delete('/posts', async (req, res) => {
+router.delete('/posts/:id', async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
 
-    await post.remove();
+    await post.deleteOne();
     res.status(200).json({ message: 'Post deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
