@@ -8,21 +8,50 @@ import type { PostType } from '../types';
 const Newsfeed: React.FC = () => {
   const [posts, setPosts] = useState<PostType[]>([]);
 
+  // Fetch posts from the API
   useEffect(() => {
-    const savedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-    setPosts(savedPosts);
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('http://localhost:5001/api/posts');
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
   }, []);
 
-  const addNewPost = (newPost: PostType) => {
-    const updatedPosts = [newPost, ...posts]; // Use state posts, not prop posts
-    setPosts(updatedPosts);
-    localStorage.setItem('posts', JSON.stringify(updatedPosts));
+  // Add a new post and send it to the API
+  const addNewPost = async (newPost: PostType) => {
+    try {
+      const response = await fetch('http://localhost:5001/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newPost),
+      });
+
+      const savedPost = await response.json();
+      setPosts([savedPost, ...posts]); // Add the newly created post to the list
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
   };
 
-  const deletePost = (id: number) => {
-    const updatedPosts = posts.filter((post) => post.id != id);
-    setPosts(updatedPosts);
-    localStorage.setItem('posts', JSON.stringify(updatedPosts));
+  // Delete a post from the API
+  const deletePost = async (id: number) => {
+    try {
+      await fetch(`http://localhost:5001/api/posts/${id}`, {
+        method: 'DELETE',
+      });
+      const updatedPosts = posts.filter((post) => post.id !== id);
+      setPosts(updatedPosts);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
   };
 
   return (
@@ -31,9 +60,6 @@ const Newsfeed: React.FC = () => {
       <div className="container newsfeed">
         <CreatePostForm onPostSubmit={addNewPost} />
         <div className="main-feed">
-          {/* {posts.map(({ content, id, likes }) => (
-            <Post key={id} id={id} content={content} likes={likes} />
-          ))} */}
           {posts.map((post) => (
             <Post post={post} onDelete={deletePost} />
           ))}

@@ -15,10 +15,6 @@ router.post('/posts', async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
-  res.send("It's working papi");
-});
-
 router.get('/posts', async (req, res) => {
   try {
     const posts = await Post.find();
