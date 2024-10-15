@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import '../assets/Newsfeed.scss';
 import CreatePostForm from '../components/CreatePostForm';
@@ -9,11 +10,39 @@ const Newsfeed: React.FC = () => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [user, setUser] = useState(null); // store the authenticated user
+
+  const navigate = useNavigate(); // for redirecting
+
+  // Function to check authentication status
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/auth/status', {
+        credentials: 'include', // Important for sending cookies
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        // If not authenticated, redirect to login page
+        navigate('/login');
+      } else {
+        const data = await response.json();
+        setUser(data.user); // Save user data if authenticated
+      }
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+      navigate('/login'); // Redirect if error occurs
+    }
+  };
 
   const fetchPosts = async (page: number) => {
     try {
       const response = await fetch(
-        `http://localhost:5001/api/posts?page=${page}&limit=10`
+        `http://localhost:5001/api/posts?page=${page}&limit=10`,
+        { credentials: 'include' } // Include credentials (cookies)
       );
       const data = await response.json();
 
@@ -31,7 +60,8 @@ const Newsfeed: React.FC = () => {
 
   // Fetch posts from the API
   useEffect(() => {
-    fetchPosts(page);
+    checkAuthStatus(); // First check if the user is authenticated
+    fetchPosts(page); // Fetch posts after checking authentication
   }, [page]);
 
   const handleNextPage = () => {
@@ -93,18 +123,24 @@ const Newsfeed: React.FC = () => {
     <div>
       <Header />
       <div className="container newsfeed">
-        <CreatePostForm onPostSubmit={addNewPost} />
-        <div className="main-feed">
-          {posts.map((post) => (
-            <Post key={post._id} post={post} onDelete={deletePost} />
-          ))}
-          <button onClick={handlePreviousPage} disabled={page === 1}>
-            Previous
-          </button>
-          <button onClick={handleNextPage} disabled={page === totalPages}>
-            Next
-          </button>
-        </div>
+        {user ? (
+          <>
+            <CreatePostForm onPostSubmit={addNewPost} />
+            <div className="main-feed">
+              {posts.map((post) => (
+                <Post key={post._id} post={post} onDelete={deletePost} />
+              ))}
+              <button onClick={handlePreviousPage} disabled={page === 1}>
+                Previous
+              </button>
+              <button onClick={handleNextPage} disabled={page === totalPages}>
+                Next
+              </button>
+            </div>
+          </>
+        ) : (
+          <p>Loading...</p> // Placeholder while checking auth
+        )}
       </div>
     </div>
   );

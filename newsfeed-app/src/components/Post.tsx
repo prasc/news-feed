@@ -8,7 +8,6 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = ({ post, onDelete }) => {
   const { _id, content, createdAt = '', likes } = post;
-  console.log('id', _id);
   const [currentLikes, setCurrentLikes] = useState<number>(likes || 0);
 
   const handleLike = () => {
