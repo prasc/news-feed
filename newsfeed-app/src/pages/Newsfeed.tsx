@@ -7,21 +7,41 @@ import type { PostType } from '../types';
 
 const Newsfeed: React.FC = () => {
   const [posts, setPosts] = useState<PostType[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchPosts = async (page: number) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5001/api/posts?page=${page}&limit=10`
+      );
+      const data = await response.json();
+
+      if (data.posts) {
+        setPosts(data.posts);
+        setTotalPages(data.totalPages);
+      } else {
+        setPosts([]);
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      setPosts([]);
+    }
+  };
 
   // Fetch posts from the API
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch('http://localhost:5001/api/posts');
-        const data = await response.json();
-        setPosts(data);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      }
-    };
+    fetchPosts(page);
+  }, [page]);
 
-    fetchPosts();
-  }, []);
+  const handleNextPage = () => {
+    if (page < totalPages) setPage(page + 1);
+    console.log('Next page:', page); // Verify page increment
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) setPage(page - 1);
+  };
 
   // Add a new post and send it to the API
   const addNewPost = async (newPost: Omit<PostType, '_id' | 'createdAt'>) => {
@@ -78,6 +98,12 @@ const Newsfeed: React.FC = () => {
           {posts.map((post) => (
             <Post key={post._id} post={post} onDelete={deletePost} />
           ))}
+          <button onClick={handlePreviousPage} disabled={page === 1}>
+            Previous
+          </button>
+          <button onClick={handleNextPage} disabled={page === totalPages}>
+            Next
+          </button>
         </div>
       </div>
     </div>

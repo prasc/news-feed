@@ -25,9 +25,21 @@ router.post('/posts', async (req, res) => {
 });
 
 router.get('/posts', async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Default to page 1
+  const limit = parseInt(req.query.limit) || 10; // Default is 10 posts per page
+
   try {
-    const posts = await Post.find();
-    res.status(200).json(posts);
+    const posts = await Post.find()
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalPosts = await Post.countDocuments();
+
+    res.status(200).json({
+      posts,
+      totalPages: Math.ceil(totalPosts / limit),
+      currentPage: page,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
