@@ -5,7 +5,7 @@ const port = process.env.PORT || 5001;
 
 // MongoDB connection
 mongoose
-  .connect('mongoDB-connection-string', {
+  .connect('mongodb://127.0.0.1:27017/newsfeed', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

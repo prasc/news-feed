@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Post = required('../models/Post');
+const Post = require('../models/Post');
 
 router.post('/posts', async (req, res) => {
   const newPost = new Post({
@@ -13,6 +13,10 @@ router.post('/posts', async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
+});
+
+router.get('/', async (req, res) => {
+  res.send("It's working papi");
 });
 
 router.get('/posts', async (req, res) => {
